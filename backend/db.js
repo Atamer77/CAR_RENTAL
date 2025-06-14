@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 
-// Create database and handle errors
+
 const db = new sqlite3.Database('car_rental.db', (err) => {
     if (err) {
         console.error('Error opening database:', err);
@@ -9,13 +9,13 @@ const db = new sqlite3.Database('car_rental.db', (err) => {
     console.log('Database connection established');
 });
 
-// Handle database errors
+
 db.on('error', (err) => {
     console.error('Database error:', err);
     process.exit(1);
 });
 
-// Clean up database connection on process exit
+
 process.on('SIGINT', () => {
     db.close((err) => {
         if (err) {
@@ -26,7 +26,7 @@ process.on('SIGINT', () => {
     });
 });
 
-// Helper function to create a table
+
 function createTable(sql, tableName) {
     return new Promise((resolve, reject) => {
         db.run(sql, (err) => {
@@ -41,7 +41,7 @@ function createTable(sql, tableName) {
     });
 }
 
-// Helper function to create an index
+
 function createIndex(sql, indexName) {
     return new Promise((resolve, reject) => {
         db.run(sql, (err) => {
@@ -56,10 +56,10 @@ function createIndex(sql, indexName) {
     });
 }
 
-// Initialize database tables
+
 async function initializeDatabase() {
     try {
-        // Enable foreign keys
+        
         await new Promise((resolve, reject) => {
             db.run('PRAGMA foreign_keys = ON', (err) => {
                 if (err) {
@@ -71,7 +71,7 @@ async function initializeDatabase() {
             });
         });
 
-        // Create tables
+        
         await createTable(
             `CREATE TABLE IF NOT EXISTS USER (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -105,7 +105,7 @@ async function initializeDatabase() {
             'BOOKINGS'
         );
 
-        // Create indexes
+        
         await createIndex(
             `CREATE INDEX IF NOT EXISTS idx_user_email ON USER(EMAIL)`,
             'idx_user_email'
@@ -121,7 +121,7 @@ async function initializeDatabase() {
             'idx_bookings_user'
         );
 
-        // Add sample cars if none exist
+        
         await new Promise((resolve, reject) => {
             db.get('SELECT COUNT(*) as count FROM CARS', [], (err, row) => {
                 if (err) {
@@ -160,13 +160,13 @@ async function initializeDatabase() {
     }
 }
 
-// Initialize database when the module is loaded
+
 initializeDatabase().catch(err => {
     console.error('Failed to initialize database:', err);
     process.exit(1);
 });
 
-// Export the database connection
+
 module.exports = {
     db
 };
