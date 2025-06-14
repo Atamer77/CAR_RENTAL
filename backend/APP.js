@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const { db } = require('./db.js');
 const port = 1911;
 
-// Error handling middleware
+
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
@@ -16,7 +16,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Request logging middleware
+
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
     next();
@@ -53,7 +53,7 @@ const generateToken = (id) => {
     return jwt.sign({ id }, JWT_SECRET, { expiresIn: '1h' })
 }
 
-// Registration endpoint
+
 app.post('/user/register', (req, res) => {
     console.log('Registration request received:', { 
         hasName: !!req.body.name, 
@@ -64,7 +64,7 @@ app.post('/user/register', (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Validate input
+        
         if (!name || !email || !password) {
             console.error('Missing required fields:', { name, email, password });
             return res.status(400).json({ error: 'Please provide name, email, and password' });
@@ -75,11 +75,11 @@ app.post('/user/register', (req, res) => {
             return res.status(400).json({ error: 'Password must be at least 6 characters' });
         }
 
-        // Hash the password first
+        
         const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
         console.log('Password hashed successfully');
 
-        // Check if user already exists
+        
         db.get('SELECT email FROM USER WHERE email = ?', [email], (err, row) => {
             if (err) {
                 console.error('Database error checking existing user:', {
@@ -97,7 +97,7 @@ app.post('/user/register', (req, res) => {
                 return res.status(400).json({ error: 'Email is already registered' });
             }
 
-            // Insert the new user
+            
             db.run(`INSERT INTO USER (NAME, EMAIL, PASSWORD) VALUES (?, ?, ?)`, 
                 [name, email, hashedPassword],
                 function(err) {
@@ -133,7 +133,7 @@ app.post('/user/register', (req, res) => {
     }
 });
 
-// Booking endpoint
+
 app.post('/book', authenticateToken, (req, res) => {
     console.log('Booking request received:', {
         userId: req.user.id,
@@ -148,7 +148,7 @@ app.post('/book', authenticateToken, (req, res) => {
         const { carId, startDate, endDate, totalPrice, paymentDetails } = req.body;
         const userId = req.user.id;
 
-        // Validate input
+        
         if (!carId || !startDate || !endDate || !totalPrice || !paymentDetails) {
             console.error('Missing required booking fields:', {
                 carId, startDate, endDate, totalPrice, paymentDetails
@@ -159,7 +159,7 @@ app.post('/book', authenticateToken, (req, res) => {
             });
         }
 
-        // Check if car exists
+        
         db.get('SELECT ID FROM CARS WHERE ID = ?', [carId], (err, row) => {
             if (err) {
                 console.error('Error checking car existence:', err);
@@ -176,7 +176,7 @@ app.post('/book', authenticateToken, (req, res) => {
                 });
             }
 
-            // Create booking with pending status
+            
             db.run(`INSERT INTO BOOKINGS (USER_ID, CAR_ID, START_DATE, END_DATE, TOTAL_PRICE, STATUS) 
                     VALUES (?, ?, ?, ?, ?, 'pending')`,
                 [userId, carId, startDate, endDate, totalPrice],
@@ -204,9 +204,9 @@ app.post('/book', authenticateToken, (req, res) => {
                         totalPrice
                     });
 
-                    // Simulate payment processing
+                    
                     setTimeout(() => {
-                        // Update booking status to confirmed
+                        
                         db.run('UPDATE BOOKINGS SET STATUS = ? WHERE ID = ?',
                             ['confirmed', this.lastID],
                             function(err) {
@@ -236,7 +236,7 @@ app.post('/book', authenticateToken, (req, res) => {
                                 });
                             }
                         );
-                    }, 1000); // Simulate payment processing delay
+                    }, 1000); 
                 }
             );
         });
@@ -253,7 +253,7 @@ app.post('/book', authenticateToken, (req, res) => {
     }
 });
 
-// Login endpoint
+
 app.post("/user/login", (req, res) => {
     const { email, password } = req.body;
 
@@ -281,7 +281,7 @@ app.post("/user/login", (req, res) => {
                 httpOnly: true,
                 sameSite: 'lax',
                 secure: false,
-                maxAge: 3600000 // 1 hour
+                maxAge: 3600000 
             });
 
             return res.status(200).json({ 
@@ -292,7 +292,7 @@ app.post("/user/login", (req, res) => {
     );
 });
 
-// Cars endpoint
+
 app.get('/cars', (req, res) => {
     console.log('Received request for cars');
     
@@ -326,12 +326,11 @@ app.get('/cars', (req, res) => {
     }
 });
 
-// Payment endpoint
+
 app.post('/process-payment', authenticateToken, (req, res) => {
     const { bookingId, paymentDetails } = req.body;
     
-    // In a real application, you would process the payment here
-    // For demo purposes, we'll just update the booking status
+    
     db.run('UPDATE BOOKINGS SET STATUS = ? WHERE ID = ?',
         ['paid', bookingId],
         function(err) {
@@ -344,7 +343,7 @@ app.post('/process-payment', authenticateToken, (req, res) => {
     );
 });
 
-// Error handling middleware
+
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
@@ -353,7 +352,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Request logging middleware
+
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
     next();
@@ -367,12 +366,12 @@ app.use(cors({
     credentials: true
 }));
 
-// Start the server
+
 app.listen(port, () => {
     console.log(`App started at port ${port}`);
 });
 
-// Clean up database connection on process exit
+
 process.on('SIGINT', () => {
     db.close((err) => {
         if (err) {
