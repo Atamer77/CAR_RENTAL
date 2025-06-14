@@ -1,0 +1,15 @@
+:root {
+  --primary-color: #2c5282;
+  --secondary-color: #6c757d;
+  --success-bg: #d4edda;
+  --error-bg: #f8d7da;
+  --border-radius: 4px;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+}
+
+.App {
+  width: 100%;
+  min-height: 100vh;
+}
