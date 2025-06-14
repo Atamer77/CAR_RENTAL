@@ -55,7 +55,7 @@ const Homepage = () => {
 
   const [selectedCar, setSelectedCar] = useState(null);
 
-  // Handle Login Form Submission
+
   const handleLogin = (e) => {
     e.preventDefault();
     fetch("http://localhost:1911/user/login", {  
@@ -77,7 +77,7 @@ const Homepage = () => {
       .catch(() => setMessage("An error occurred during login."));
   };
 
-  // Handle Register Form Submission
+  
   const handleRegister = async (e) => {
     e.preventDefault();
     setMessage(""); 
