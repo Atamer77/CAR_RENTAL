@@ -1,4 +1,4 @@
-import React, { useState } from 'react';//stateful hook
+import React, { useState } from 'react';
 import './Payment.css';
 
 const Payment = ({ userId, carId, carName, pricePerDay, onCancel }) => {
@@ -16,18 +16,18 @@ const Payment = ({ userId, carId, carName, pricePerDay, onCancel }) => {
     const [message, setMessage] = useState('');
     const [success, setSuccess] = useState(false);
 
-    const handleSubmit = (e) => {//arrow function 
-        e.preventDefault();//dont allow refresh
+    const handleSubmit = (e) => {
+        e.preventDefault();
         setLoading(true);
         setMessage('');
 
-        // Calculate total price based on selected dates
+        
         const start = new Date(paymentDetails.startDate);
         const end = new Date(paymentDetails.endDate);
         const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
         const totalPrice = days * pricePerDay;
 
-        // Process booking and payment
+        
         fetch('http://localhost:1911/book', {
             method: 'POST',
             headers: {
@@ -46,16 +46,16 @@ const Payment = ({ userId, carId, carName, pricePerDay, onCancel }) => {
                     cvv: paymentDetails.cvv
                 }
             }),
-            credentials: 'include'//cookies 
+            credentials: 'include'
         })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     setSuccess(true);
                     setMessage('Payment successful! Your car has been booked.');
-                    // Clear form
+                    
                     setPaymentDetails(initialState);
-                    // Return to home page after 3 seconds
+                    
                     setTimeout(() => {
                         onCancel();
                     }, 3000);
@@ -65,7 +65,7 @@ const Payment = ({ userId, carId, carName, pricePerDay, onCancel }) => {
             })
             .catch(error => {
                 setMessage('Payment processing failed. Please try again.');
-                console.error('Payment error:', error);//
+                console.error('Payment error:', error);
             })
             .finally(() => {
                 setLoading(false);
